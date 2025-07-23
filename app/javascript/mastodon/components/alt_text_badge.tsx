@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useId } from 'react';
 
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Overlay from 'react-overlays/Overlay';
 import type {
@@ -8,7 +8,13 @@ import type {
   UsePopperOptions,
 } from 'react-overlays/esm/usePopper';
 
-import { useSelectableClick } from 'mastodon/hooks/useSelectableClick';
+import CloseIcon from '@/material-icons/400-24px/close.svg?react';
+
+import { IconButton } from "./icon_button.js";
+
+const messages = defineMessages({
+  dismiss: { id: 'alt_text_badge.dismiss', defaultMessage: 'Dismiss' },
+});
 
 const offset = [0, 4] as OffsetValue;
 const popperConfig = { strategy: 'fixed' } as UsePopperOptions;
@@ -16,6 +22,7 @@ const popperConfig = { strategy: 'fixed' } as UsePopperOptions;
 export const AltTextBadge: React.FC<{
   description: string;
 }> = ({ description }) => {
+  const intl = useIntl();
   const accessibilityId = useId();
   const anchorRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
@@ -27,8 +34,6 @@ export const AltTextBadge: React.FC<{
   const handleClose = useCallback(() => {
     setOpen(false);
   }, [setOpen]);
-
-  const [handleMouseDown, handleMouseUp] = useSelectableClick(handleClose);
 
   return (
     <>
@@ -55,13 +60,12 @@ export const AltTextBadge: React.FC<{
       >
         {({ props }) => (
           <div {...props} className='hover-card-controller'>
-            <div // eslint-disable-line jsx-a11y/no-noninteractive-element-interactions
+            <div
               className='media-gallery__alt__popover dropdown-animation'
               role='region'
               id={accessibilityId}
-              onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp}
             >
+              <IconButton title={intl.formatMessage(messages.dismiss)} icon='times' iconComponent={CloseIcon} onClick={handleClose} />
               <h4>
                 <FormattedMessage
                   id='alt_text_badge.title'
